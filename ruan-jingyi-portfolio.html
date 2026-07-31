@@ -8,6 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <!-- Preload key video assets for instant playback -->
+  <link rel="preload" href="assets/gufeng-video.mp4" as="video" type="video/mp4">
+  <link rel="preload" href="assets/meizhiyuan-video.mp4" as="video" type="video/mp4">
+  <link rel="preload" href="assets/aigc-qihao-video.mp4" as="video" type="video/mp4">
+  <link rel="preload" href="assets/POPMART-video.mp4" as="video" type="video/mp4">
+  <link rel="preload" href="assets/aigc-product-ad.mp4" as="video" type="video/mp4">
   <style>
     :root {
       --button-outline: rgba(0,0,0,.08);
@@ -840,6 +846,43 @@
       width: 100%; max-height: 70vh; object-fit: contain; display: block;
       background: #000;
     }
+    /* Video poster overlay - click to play */
+    .video-poster-wrap {
+      position: relative; width: 100%; max-height: 70vh;
+      display: flex; align-items: center; justify-content: center;
+      background: #000; cursor: pointer;
+    }
+    .video-poster-wrap img {
+      width: 100%; max-height: 70vh; object-fit: contain; display: block;
+    }
+    .video-play-btn {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); border: 2px solid rgba(255,255,255,0.8);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s ease; z-index: 2;
+    }
+    .video-play-btn svg { width: 28px; height: 28px; fill: #fff; margin-left: 3px; }
+    .video-poster-wrap:hover .video-play-btn {
+      background: rgba(0,0,0,0.75); transform: translate(-50%, -50%) scale(1.08);
+    }
+    /* Video loading spinner */
+    .video-spinner {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px; height: 48px; z-index: 10;
+      display: none;
+    }
+    .video-spinner.active { display: block; }
+    .video-spinner div {
+      box-sizing: border-box; display: block;
+      position: absolute; width: 36px; height: 36px;
+      margin: 6px; border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%; border-top-color: #fff;
+      animation: vid-spin 0.8s linear infinite;
+    }
+    @keyframes vid-spin { to { transform: rotate(360deg); } }
     .modal-gallery { display: flex; flex-direction: column; gap: 0.75rem; }
     .modal-thumbs { display: flex; gap: 0.5rem; padding: 0 0.5rem; flex-wrap: wrap; }
     .modal-thumbs img {
@@ -1066,7 +1109,7 @@
             <span class="wf-arrow">→</span>
             <span class="wf-step">落地交付</span>
           </div>
-          <img src="assets/ai-process.png" alt="AI 生成过程" class="workflow-process-img">
+          <img src="assets/ai-process.jpg" alt="AI 生成过程" class="workflow-process-img">
         </div>
       </div>
     </div>
@@ -1236,8 +1279,9 @@
       <div class="modal-gallery">
         <div class="modal-img">
           <div class="modal-img-bg" id="modalImgBg"></div>
-          <img id="modalImg" src="" alt="">
-          <video id="modalVideo" src="" controls style="display:none;"></video>
+          <img id="modalImg" src="" alt="" decoding="async">
+          <div class="video-spinner" id="videoSpinner"><div></div></div>
+          <video id="modalVideo" src="" controls preload="auto" playsinline style="display:none;"></video>
         </div>
         <div id="modalThumbs" class="modal-thumbs"></div>
       </div>
@@ -1264,10 +1308,10 @@
           'assets/baisha-03.jpg'
         ],
         videos: [
-          'assets/maolong-video1.mp4',
-          'assets/maolong-video2.mp4',
-          'assets/maolong-video3.mp4',
-          'assets/maolong-video4.mp4'
+          { src: 'assets/maolong-video1.mp4', poster: 'assets/baisha-01.jpg' },
+          { src: 'assets/maolong-video2.mp4', poster: 'assets/baisha-02.jpg' },
+          { src: 'assets/maolong-video3.mp4', poster: 'assets/baisha-03.jpg' },
+          { src: 'assets/maolong-video4.mp4', poster: 'assets/baisha-04.jpg' }
         ]
       },
       {
@@ -1278,7 +1322,7 @@
         img: 'assets/gongdeng-1.jpg',
         gallery: [
           'assets/gongdeng-1.jpg',
-          'assets/gongdeng-2.png',
+          'assets/gongdeng-2.jpg',
           { type: 'video', src: 'assets/gongdeng-video.mp4', poster: 'assets/gongdeng-1.jpg' }
         ]
       },
@@ -1287,13 +1331,13 @@
         category: 'aigc_video',
         catLabel: 'AIGC视频',
         description: '运用 AIGC 技术生成的产品广告视频。通过 AI 工具完成从概念脚本、视觉风格设定到动态生成的全流程创作，探索人工智能在商业广告领域的应用边界。视频融合了产品卖点与情感叙事，以高效、低成本的方式实现传统广告制作的创意效果。',
-        img: 'assets/product-ad-01.png',
+        img: 'assets/product-ad-01.jpg',
         gallery: [
-          'assets/product-ad-01.png',
-          'assets/product-ad-02.png'
+          'assets/product-ad-01.jpg',
+          'assets/product-ad-02.jpg'
         ],
         videos: [
-          'assets/aigc-product-ad.mp4'
+          { src: 'assets/aigc-product-ad.mp4', poster: 'assets/product-ad-01.jpg' }
         ]
       },
       {
@@ -1301,13 +1345,13 @@
         category: 'aigc_video',
         catLabel: 'AIGC视频',
         description: '以古风短剧形式呈现的产品广告，运用 AIGC 技术完成从剧本构思、角色设定到视频生成的全流程创作。将产品自然融入古代生活场景，通过叙事化表达传递品牌文化价值，探索 AI 生成内容在短剧营销领域的创新应用。',
-        img: 'assets/gufeng-01.png',
+        img: 'assets/gufeng-01.jpg',
         gallery: [
-          'assets/gufeng-01.png',
-          'assets/gufeng-02.png'
+          'assets/gufeng-01.jpg',
+          'assets/gufeng-02.jpg'
         ],
         videos: [
-          'assets/gufeng-video.mp4'
+          { src: 'assets/gufeng-video.mp4', poster: 'assets/gufeng-01.jpg' }
         ]
       },
       {
@@ -1321,7 +1365,7 @@
           'assets/POPMART-02.jpg'
         ],
         videos: [
-          'assets/POPMART-video.mp4'
+          { src: 'assets/POPMART-video.mp4', poster: 'assets/POPMART-01.jpg' }
         ]
       },
       {
@@ -1329,12 +1373,12 @@
         category: 'aigc_video',
         catLabel: 'AIGC视频',
         description: '为美汁源品牌创作的 AIGC 视频广告。运用 AI 生成技术呈现果汁产品的新鲜活力与自然质感，以流畅的动态视觉传递品牌「阳光、自然、健康」的核心价值。从概念脚本到视频生成全流程 AIGC 创作，探索 AI 在快消品广告领域的创新应用。',
-        img: 'assets/meizhiyuan-01.png',
+        img: 'assets/meizhiyuan-01.jpg',
         gallery: [
-          'assets/meizhiyuan-01.png'
+          'assets/meizhiyuan-01.jpg'
         ],
         videos: [
-          'assets/meizhiyuan-video.mp4'
+          { src: 'assets/meizhiyuan-video.mp4', poster: 'assets/meizhiyuan-01.jpg' }
         ]
       },
       {
@@ -1342,12 +1386,12 @@
         category: 'aigc_video',
         catLabel: 'AIGC视频',
         description: '运用 AIGC 技术打造的起号视频作品。从账号定位、内容策划到视频生成，全流程 AI 赋能，高效产出高质量短视频内容。探索人工智能在短视频运营与账号孵化中的创新应用，实现从零到一的快速起号策略。',
-        img: 'assets/aigc-qihao-01.png',
+        img: 'assets/aigc-qihao-01.jpg',
         gallery: [
-          'assets/aigc-qihao-01.png'
+          'assets/aigc-qihao-01.jpg'
         ],
         videos: [
-          'assets/aigc-qihao-video.mp4'
+          { src: 'assets/aigc-qihao-video.mp4', poster: 'assets/aigc-qihao-01.jpg' }
         ]
       },
       {
@@ -1355,11 +1399,11 @@
         category: 'stage_design',
         catLabel: '舞台空间设计',
         description: '以白蛇传为题材的舞台空间设计方案。以宋代美学为视觉基调，运用纱幕、投影与实景装置的层次叠加，构建虚实相生的舞台空间。色彩体系取自宋瓷釉色与绢本设色，整体氛围雅致含蓄，以空间叙事呼应戏剧情感。',
-        img: 'assets/baishe-01.png',
+        img: 'assets/baishe-01.jpg',
         gallery: [
-          'assets/baishe-01.png',
-          'assets/baishe-02.png',
-          'assets/baishe-03.png',
+          'assets/baishe-01.jpg',
+          'assets/baishe-02.jpg',
+          'assets/baishe-03.jpg',
           'assets/baishe-04.jpg',
           'assets/baishe-05.jpg'
         ]
@@ -1369,11 +1413,11 @@
         category: 'stage_design',
         catLabel: '舞台空间设计',
         description: '为端午节主题晚会设计的舞台空间方案。以龙舟、粽叶、艾草等端午元素为视觉符号，通过现代舞台技术进行抽象化转译。主舞台以弧形LED屏模拟水面波光，吊装装置以粽叶形态悬浮于空中，营造沉浸式的节日氛围。',
-        img: 'assets/zhubian-01.png',
+        img: 'assets/zhubian-01.jpg',
         gallery: [
-          'assets/zhubian-01.png',
-          'assets/zhubian-02.png',
-          'assets/zhubian-03.png'
+          'assets/zhubian-01.jpg',
+          'assets/zhubian-02.jpg',
+          'assets/zhubian-03.jpg'
         ]
       },
       {
@@ -1420,10 +1464,10 @@
           'assets/haoshi-04.jpg'
         ],
         videos: [
-          'assets/haoshi-video1.mp4',
-          'assets/haoshi-video2.mp4',
-          'assets/haoshi-video3.mp4',
-          'assets/haoshi-video4.mp4'
+          { src: 'assets/haoshi-video1.mp4', poster: 'assets/haoshi-01.jpg' },
+          { src: 'assets/haoshi-video2.mp4', poster: 'assets/haoshi-02.jpg' },
+          { src: 'assets/haoshi-video3.mp4', poster: 'assets/haoshi-03.jpg' },
+          { src: 'assets/haoshi-video4.mp4', poster: 'assets/haoshi-04.jpg' }
         ]
       },
       {
@@ -1431,11 +1475,11 @@
         category: 'ad_visual',
         catLabel: '广告视觉设计',
         description: '为三福品牌创作的海报广告设计。以年轻潮流为视觉基调，运用高饱和度色彩搭配与几何图形构成，传递品牌活力与时尚感。三幅海报分别展现不同产品线，形成统一的视觉识别系统，适用于门店陈列与线上推广。',
-        img: 'assets/sanfu-01.png',
+        img: 'assets/sanfu-01.jpg',
         gallery: [
-          'assets/sanfu-01.png',
-          'assets/sanfu-02.png',
-          'assets/sanfu-03.png'
+          'assets/sanfu-01.jpg',
+          'assets/sanfu-02.jpg',
+          'assets/sanfu-03.jpg'
         ]
       },
       {
@@ -1443,10 +1487,10 @@
         category: 'ad_visual',
         catLabel: '广告视觉设计',
         description: '运用 AIGC 技术生成的广告视觉作品。通过 AI 工具完成从概念创意到视觉落地的全流程创作，探索人工智能在商业广告视觉领域的应用边界。作品融合了品牌调性与前沿 AI 美学，以高效、低成本的方式实现传统广告制作无法企及的创意效果。',
-        img: 'assets/aigc-ad-01.png',
+        img: 'assets/aigc-ad-01.jpg',
         gallery: [
-          'assets/aigc-ad-01.png',
-          'assets/aigc-ad-02.png'
+          'assets/aigc-ad-01.jpg',
+          'assets/aigc-ad-02.jpg'
         ]
       },
       {
@@ -1469,7 +1513,7 @@
           'assets/chahua-01.jpg',
           'assets/chahua-02.jpg',
           'assets/chahua-03.jpg',
-          'assets/chahua-04.png'
+          'assets/chahua-04.jpg'
         ]
       },
       {
@@ -1477,19 +1521,19 @@
         category: 'personal',
         catLabel: '个人创作',
         description: '个人原创UI设计作品，涵盖移动端界面、图标设计与交互流程。以用户体验为核心，注重视觉层次与信息架构的清晰呈现。设计风格简约现代，色彩搭配考究，交互逻辑流畅，展现了从概念到高保真原型的完整设计能力。',
-        img: 'assets/ui-01.png',
+        img: 'assets/ui-01.jpg',
         gallery: [
-          'assets/ui-01.png',
-          'assets/ui-02.png',
-          'assets/ui-03.png',
-          'assets/ui-04.png',
-          'assets/ui-05.png',
-          'assets/ui-06.png',
-          'assets/ui-07.png',
-          'assets/ui-08.png',
-          'assets/ui-09.png',
-          'assets/ui-10.png',
-          'assets/ui-11.png'
+          'assets/ui-01.jpg',
+          'assets/ui-02.jpg',
+          'assets/ui-03.jpg',
+          'assets/ui-04.jpg',
+          'assets/ui-05.jpg',
+          'assets/ui-06.jpg',
+          'assets/ui-07.jpg',
+          'assets/ui-08.jpg',
+          'assets/ui-09.jpg',
+          'assets/ui-10.jpg',
+          'assets/ui-11.jpg'
         ]
       }
     ];
@@ -1504,7 +1548,7 @@
           '<div class="song-corner tr"></div>' +
           '<div class="song-corner bl"></div>' +
           '<div class="song-corner br"></div>' +
-          '<div class="work-img-wrap"><img src="' + w.img + '" alt="' + w.title + '"></div>' +
+          '<div class="work-img-wrap"><img src="' + w.img + '" alt="' + w.title + '" decoding="async"></div>' +
           '<div class="work-info">' +
             '<span class="work-cat">' + w.catLabel + '</span>' +
             '<h3 class="work-title">' + w.title + '</h3>' +
@@ -1538,22 +1582,35 @@
     var modalImg = document.getElementById('modalImg');
     var modalVideo = document.getElementById('modalVideo');
     var modalImgBg = document.getElementById('modalImgBg');
+    var videoSpinner = document.getElementById('videoSpinner');
 
     function showGalleryItem(item) {
       if (typeof item === 'string') {
+        // Show image
         modalImg.src = item;
         modalImg.alt = '';
         modalImg.style.display = 'block';
         modalVideo.style.display = 'none';
         modalVideo.pause();
-        modalVideo.src = '';
+        modalVideo.removeAttribute('src');
+        modalVideo.load();
+        videoSpinner.classList.remove('active');
         modalImgBg.style.backgroundImage = 'url(' + item + ')';
       } else if (item && item.type === 'video') {
-        modalVideo.src = item.src;
-        modalVideo.poster = item.poster || '';
-        modalVideo.style.display = 'block';
+        // Show video with poster + auto play
         modalImg.style.display = 'none';
+        modalVideo.poster = item.poster || '';
+        modalVideo.src = item.src;
+        modalVideo.style.display = 'block';
         modalImgBg.style.backgroundImage = item.poster ? 'url(' + item.poster + ')' : 'none';
+        
+        // Show spinner, auto-play when ready
+        videoSpinner.classList.add('active');
+        modalVideo.addEventListener('canplay', function onCanPlay() {
+          videoSpinner.classList.remove('active');
+          modalVideo.removeEventListener('canplay', onCanPlay);
+          modalVideo.play().catch(function() {});
+        }, { once: true });
       }
     }
 
@@ -1565,9 +1622,21 @@
       // Build gallery: images first, then videos as objects with type
       currentGallery = [];
       var galleryItems = (w.gallery && w.gallery.length) ? w.gallery : [w.img];
-      galleryItems.forEach(function(item) { currentGallery.push(item); });
+      galleryItems.forEach(function(item) {
+        if (typeof item === 'string') {
+          currentGallery.push(item);
+        } else if (item && item.type === 'video') {
+          currentGallery.push(item);
+        }
+      });
       if (w.videos && w.videos.length) {
-        w.videos.forEach(function(v) { currentGallery.push({ type: 'video', src: v }); });
+        w.videos.forEach(function(v) {
+          if (typeof v === 'string') {
+            currentGallery.push({ type: 'video', src: v });
+          } else {
+            currentGallery.push({ type: 'video', src: v.src, poster: v.poster || w.img });
+          }
+        });
       }
       if (!currentGallery.length) currentGallery = [w.img];
 
@@ -1575,18 +1644,25 @@
         var isVideo = (typeof item !== 'string' && item.type === 'video');
         var thumb;
         if (isVideo) {
-          // Video thumbnail with play icon overlay
+          // Video thumbnail: use poster image with play icon overlay
+          var posterUrl = item.poster || w.img;
           thumb = document.createElement('div');
           thumb.className = (i === 0 ? 'active ' : '') + 'thumb-video';
-          thumb.style.cssText = 'position:relative;width:60px;height:45px;background:rgba(26,28,31,0.08);border-radius:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;';
-          var playIcon = document.createElement('div');
-          playIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
-          playIcon.style.cssText = 'color:var(--primary);opacity:0.7;';
-          thumb.appendChild(playIcon);
+          thumb.style.cssText = 'position:relative;width:60px;height:45px;border-radius:2px;cursor:pointer;flex-shrink:0;overflow:hidden;background:#000;';
+          var thumbImg = document.createElement('img');
+          thumbImg.src = posterUrl;
+          thumbImg.alt = w.title;
+          thumbImg.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:0.7;';
+          thumb.appendChild(thumbImg);
+          var playOverlay = document.createElement('div');
+          playOverlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);';
+          playOverlay.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+          thumb.appendChild(playOverlay);
         } else {
           thumb = document.createElement('img');
           thumb.src = item;
           thumb.alt = w.title;
+          thumb.decoding = 'async';
           thumb.className = (i === 0 ? 'active ' : '');
           thumb.style.cssText = 'width:60px;height:45px;object-fit:cover;border-radius:2px;cursor:pointer;flex-shrink:0;';
         }
@@ -1605,6 +1681,9 @@
       document.getElementById('workModal').classList.remove('open');
       document.body.style.overflow = '';
       modalVideo.pause();
+      modalVideo.removeAttribute('src');
+      modalVideo.load();
+      videoSpinner.classList.remove('active');
     }
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeModal();
